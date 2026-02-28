@@ -81,7 +81,7 @@ def get_chart_image(browser, symbol):
     <div id="tv_chart"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-    new TradingView.widget({{
+    var widget = new TradingView.widget({{
         "width": 1920,
         "height": 1080,
         "symbol": "{symbol}",
@@ -94,21 +94,14 @@ def get_chart_image(browser, symbol):
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
-        "container_id": "tv_chart",
-        "studies": [
-            "Moving Average@tv-basicstudies",   // 第一条 MA
-            "Moving Average@tv-basicstudies",   // 第二条 MA
-            "Moving Average@tv-basicstudies"    // 第三条 MA
-        ],
-        "studyOverrides": {
-            "Moving Average@tv-basicstudies.length": 5,    // 第一条 MA 周期
-            "Moving Average@tv-basicstudies.color": "#FF0000",
-            "Moving Average@tv-basicstudies_1.length": 20,  // 第二条 MA 周期
-            "Moving Average@tv-basicstudies_1.color": "#00FF00",
-            "Moving Average@tv-basicstudies_2.length": 99,  // 第三条 MA 周期
-            "Moving Average@tv-basicstudies_2.color": "#0000FF"
-        }
+        "container_id": "tv_chart"
     }});
+    widget.onChartReady(function() {
+        var chart = widget.activeChart();
+        chart.createStudy('Moving Average', false, false, [5], null, {"plot.color":"#FF0000"});
+        chart.createStudy('Moving Average', false, false, [10], null, {"plot.color":"#00FF00"});
+        chart.createStudy('Moving Average', false, false, [20], null, {"plot.color":"#0000FF"});
+    });
     </script>
     </body>
     </html>
