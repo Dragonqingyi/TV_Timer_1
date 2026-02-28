@@ -81,7 +81,7 @@ def get_chart_image(browser, symbol):
     <div id="tv_chart"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-    var widget = new TradingView.widget({{
+    new TradingView.widget({{
         "width": 1920,
         "height": 1080,
         "symbol": "{symbol}",
@@ -96,12 +96,6 @@ def get_chart_image(browser, symbol):
         "save_image": false,
         "container_id": "tv_chart"
     }});
-    widget.onChartReady(function() {
-        var chart = widget.activeChart();
-        chart.createStudy('Moving Average', false, false, [5], null, {"plot.color":"#FF0000"});
-        chart.createStudy('Moving Average', false, false, [10], null, {"plot.color":"#00FF00"});
-        chart.createStudy('Moving Average', false, false, [20], null, {"plot.color":"#0000FF"});
-    });
     </script>
     </body>
     </html>
