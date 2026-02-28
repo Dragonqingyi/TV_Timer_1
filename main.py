@@ -18,8 +18,7 @@ def get_feishu_token():
 
 def get_chart_image():
     # 使用 Chart-img API 获取 TradingView 高级图表截图
-    url = f"https://api.chart-img.com/v1/tradingview/advanced-chart?symbol={SYMBOL}&interval={INTERVAL}&theme=dark"
-    res = requests.get(url, headers={"x-api-key": CHART_API_KEY})
+    url = f"https://api.chart-img.com/v1/tradingview/advanced-chart?symbol={SYMBOL}&interval={INTERVAL}&theme=dark&width=1920&height=1080"
     if res.status_code == 200:
         return res.content
     else:
