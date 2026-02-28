@@ -90,7 +90,7 @@ def send_feishu_msg(image_key, symbol):
             ],
             "header": {
                 "title": {
-                    "content": f"📈 {symbol} {TIME_TEXT}",
+                    "content": f"{symbol} {TIME_TEXT}",
                     "tag": "plain_text"
                 },
                 "template": "blue"
