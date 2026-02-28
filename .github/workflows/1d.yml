@@ -2,8 +2,6 @@ name: Send 1d Chart
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'  # UTC 0点 = 北京时间早晨 8点
 
 jobs:
   run-bot:
