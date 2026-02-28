@@ -72,20 +72,7 @@ def send_feishu_msg(image_key, symbol):
 # 浏览器截图核心
 # =============================
 def get_chart_image(browser, symbol):
-    # 加载 MACD
-    my_indicators = ["MACD@tv-basicstudies"]
-    studies_json = json.dumps(my_indicators)
-    
-    # 强制修改 MACD 的颜色配置
-    overrides = {
-        "MACD.MACD.color": "#00FF00",
-        "MACD.MACD.linewidth": 2,
-        "MACD.Signal.color": "#FF0000",
-        "MACD.Signal.linewidth": 2,
-        "MACD.Histogram.color": "rgba(255, 255, 255, 0.4)"  # 👈 修复深色模式下的量能柱可见度
-    }
-    overrides_json = json.dumps(overrides)
-
+    # 没有任何额外指标，最纯净的原生 K 线图
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -99,29 +86,32 @@ def get_chart_image(browser, symbol):
         "symbol": "{symbol}",
         "interval": "{INTERVAL}",
         "timezone": "Asia/Shanghai",
-        "theme": "dark",
+        "theme": "white",
         "style": "1",
         "locale": "en",
         "enable_publishing": false,
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
-        "container_id": "tv_chart",
-        "studies": {studies_json},
-        "studies_overrides": {overrides_json}
+        "container_id": "tv_chart"
     }});
     </script>
     </body>
     </html>
     """
     
+    # 新建标签页
     page = browser.new_page(viewport={"width": 1920, "height": 1080})
     page.set_content(html_content)
-    page.wait_for_selector("iframe", timeout=20000)
-    page.wait_for_timeout(8000)
     
+    # 等待框架加载
+    page.wait_for_selector("iframe", timeout=20000)
+    # 等待8秒，确保 K 线和底部的成交量柱子完全渲染出来
+    page.wait_for_timeout(8000) 
+    
+    # 截图并关闭标签页
     img_bytes = page.screenshot(type="png")
-    page.close()
+    page.close() 
     return img_bytes
 
 # =============================
