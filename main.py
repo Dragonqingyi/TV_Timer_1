@@ -7,7 +7,7 @@ FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET")
 FEISHU_WEBHOOK = os.getenv("FEISHU_WEBHOOK")
 
 # 接收从 GitHub Actions 传进来的参数，如果没有传，默认是 BTCUSDT 的 1小时(60)
-SYMBOL = os.getenv("TV_SYMBOL", "BINANCE:BTCUSDT")
+SYMBOL = os.getenv("TV_SYMBOL", "BINANCE:BTCUSDT.P")
 INTERVAL = os.getenv("TV_INTERVAL", "60")  
 
 # 给不同的周期起个中文名，用于飞书标题
