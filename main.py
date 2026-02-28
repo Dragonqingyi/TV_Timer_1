@@ -45,7 +45,7 @@ def get_chart_image(browser, symbol):
         "timezone": "Asia/Shanghai",
         "theme": "dark",
         "style": "1",
-        "locale": "zh_CN",
+        "locale": "en",
         "enable_publishing": false,
         "hide_top_toolbar": false,
         "hide_legend": false,
