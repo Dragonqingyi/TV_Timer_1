@@ -72,13 +72,24 @@ def send_feishu_msg(image_key, symbol):
 # 浏览器截图核心
 # =============================
 def get_chart_image(browser, symbol):
-    # 👇 这里只保留了 MACD 这一项
-    my_indicators = [
-        "MACD@tv-basicstudies"
-    ]
-    
-    # 将 Python 列表转成 JavaScript 格式
+    # 只加载 MACD
+    my_indicators = ["MACD@tv-basicstudies"]
     studies_json = json.dumps(my_indicators)
+    
+    # 强制修改 MACD 的颜色配置（快线绿，慢线红）
+    overrides = {
+        # MACD 快线 (绿)，线条加粗
+        "macd@tv-basicstudies.macd.color": "#00FF00",
+        "macd@tv-basicstudies.macd.linewidth": 2,
+        
+        # Signal 慢线 (红)，线条加粗
+        "macd@tv-basicstudies.signal.color": "#FF0000",
+        "macd@tv-basicstudies.signal.linewidth": 2,
+        
+        # 能量柱 (因为是单色，我们把它变成半透明暗灰，作为背景衬托红绿线)
+        "macd@tv-basicstudies.histogram.color": "rgba(128, 128, 128, 0.3)"
+    }
+    overrides_json = json.dumps(overrides)
 
     html_content = f"""
     <!DOCTYPE html>
@@ -101,24 +112,21 @@ def get_chart_image(browser, symbol):
         "hide_legend": false,
         "save_image": false,
         "container_id": "tv_chart",
-        "studies": {studies_json}  // 👈 注入 MACD
+        "studies": {studies_json},
+        "studies_overrides": {overrides_json}  // 👈 注入自定义颜色
     }});
     </script>
     </body>
     </html>
     """
     
-    # 新建标签页
     page = browser.new_page(viewport={"width": 1920, "height": 1080})
     page.set_content(html_content)
-    
-    # 等待框架加载
     page.wait_for_selector("iframe", timeout=20000)
-    # 额外等待8秒，确保K线和底部的 MACD 副图都完全渲染出来
-    page.wait_for_timeout(8000) 
+    page.wait_for_timeout(8000)
     
     img_bytes = page.screenshot(type="png")
-    page.close() # 截完图马上关闭标签页
+    page.close()
     return img_bytes
 
 # =============================
