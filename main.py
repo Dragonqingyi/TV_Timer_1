@@ -48,25 +48,26 @@ def upload_image_to_feishu(image_bytes, token):
     return res.get("data", {}).get("image_key")
 
 def send_feishu_msg(image_key, symbol):
+    # 【改动】去掉了臃肿的 header，把标题改成了正文里的 Markdown 加粗小字
     payload = {
         "msg_type": "interactive",
         "card": {
-            "elements":[{
-                "tag": "img",
-                "img_key": image_key,
-                "alt": {"tag": "plain_text", "content": "图表"}
-            }],
-            "header": {
-                "title": {
-                    "content": f"{symbol} {TIME_TEXT}",
-                    "tag": "plain_text"
+            "elements":[
+                {
+                    "tag": "markdown",
+                    "content": f"*** {symbol} {TIME_TEXT} ***"  # 这里使用普通大小的文本
                 },
-                "template": "blue"
-            }
+                {
+                    "tag": "img",
+                    "img_key": image_key,
+                    "alt": {"tag": "plain_text", "content": "图表"}
+                }
+            ]
+            # 注意：这里彻底删除了原本的 "header" 模块
         }
     }
     res = requests.post(FEISHU_WEBHOOK, json=payload)
-    print(f"👉 {symbol} 飞书发送结果:", res.text)
+    print(f"👉 {symbol} 发送结果:", res.text)
 
 # =============================
 # 浏览器截图核心
