@@ -2,9 +2,6 @@ name: Send 4h Chart
 
 on:
   workflow_dispatch:
-  schedule:
-    # 对应北京时间 8:00, 12:00, 16:00, 20:00, 0:00, 4:00
-    - cron: '3 0,4,8,12,16,20 * * *'
 
 jobs:
   run-bot:
