@@ -1,0 +1,31 @@
+name: Auto Send TV Chart to Feishu
+
+on:
+  workflow_dispatch:  # 允许你随时手动点击运行（测试用）
+  schedule:
+    # 定时器：这里配置的是“每4个小时”运行一次
+    # 注意：GitHub 服务器使用 UTC 时间 (0时区)，北京时间是 +8 小时
+    - cron: '0 0,4,8,12,16,20 * * *'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          CHART_API_KEY: ${{ secrets.CHART_API_KEY }}
+        run: python main.py
