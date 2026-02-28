@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import requests
 from playwright.sync_api import sync_playwright
@@ -71,6 +72,14 @@ def send_feishu_msg(image_key, symbol):
 # 浏览器截图核心
 # =============================
 def get_chart_image(browser, symbol):
+    # 👇 这里只保留了 MACD 这一项
+    my_indicators = [
+        "MACD@tv-basicstudies"
+    ]
+    
+    # 将 Python 列表转成 JavaScript 格式
+    studies_json = json.dumps(my_indicators)
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -86,12 +95,13 @@ def get_chart_image(browser, symbol):
         "timezone": "Asia/Shanghai",
         "theme": "dark",
         "style": "1",
-        "locale": "zh_CN",
+        "locale": "en",
         "enable_publishing": false,
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
-        "container_id": "tv_chart"
+        "container_id": "tv_chart",
+        "studies": {studies_json}  // 👈 注入 MACD
     }});
     </script>
     </body>
@@ -102,11 +112,13 @@ def get_chart_image(browser, symbol):
     page = browser.new_page(viewport={"width": 1920, "height": 1080})
     page.set_content(html_content)
     
+    # 等待框架加载
     page.wait_for_selector("iframe", timeout=20000)
-    page.wait_for_timeout(8000) # 等待K线渲染
+    # 额外等待8秒，确保K线和底部的 MACD 副图都完全渲染出来
+    page.wait_for_timeout(8000) 
     
     img_bytes = page.screenshot(type="png")
-    page.close() # 截完图马上关闭标签页，释放内存
+    page.close() # 截完图马上关闭标签页
     return img_bytes
 
 # =============================
