@@ -19,6 +19,6 @@ jobs:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
-          TV_SYMBOL: 'BINANCE:BTCUSDT'
+          TV_SYMBOL: 'BINANCE:BTCUSDT.P'
           TV_INTERVAL: '60'   # 👈 核心：告诉 Python 截取 1小时
         run: python main.py
