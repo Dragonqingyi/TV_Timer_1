@@ -94,7 +94,20 @@ def get_chart_image(browser, symbol):
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
-        "container_id": "tv_chart"
+        "container_id": "tv_chart",
+        "studies": [
+            "Moving Average@tv-basicstudies",   // 第一条 MA
+            "Moving Average@tv-basicstudies",   // 第二条 MA
+            "Moving Average@tv-basicstudies"    // 第三条 MA
+        ],
+        "studyOverrides": {
+            "Moving Average@tv-basicstudies.length": 5,    // 第一条 MA 周期
+            "Moving Average@tv-basicstudies.color": "#FF0000",
+            "Moving Average@tv-basicstudies_1.length": 20,  // 第二条 MA 周期
+            "Moving Average@tv-basicstudies_1.color": "#00FF00",
+            "Moving Average@tv-basicstudies_2.length": 99,  // 第三条 MA 周期
+            "Moving Average@tv-basicstudies_2.color": "#0000FF"
+        }
     }});
     </script>
     </body>
