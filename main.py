@@ -94,6 +94,7 @@ def get_chart_image(browser, symbol):
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
+        "studies": ["Volume@tv-basicstudies"],
         "container_id": "tv_chart"
     }});
     </script>
