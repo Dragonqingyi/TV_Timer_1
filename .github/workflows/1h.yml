@@ -1,0 +1,24 @@
+name: Send 1h Chart
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'  # 每小时的 0分 触发
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install requests playwright && playwright install chromium
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          TV_SYMBOL: 'BINANCE:BTCUSDT'
+          TV_INTERVAL: '60'   # 👈 核心：告诉 Python 截取 1小时
+        run: python main.py
