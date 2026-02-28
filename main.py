@@ -6,10 +6,19 @@ FEISHU_APP_ID = os.getenv("FEISHU_APP_ID")
 FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET")
 FEISHU_WEBHOOK = os.getenv("FEISHU_WEBHOOK")
 
-# 你想截图的交易对
-SYMBOL = "BINANCE:BTCUSDT" 
-# 60代表1小时，240代表4小时，"D"代表日线
-INTERVAL = "240"  
+# 接收从 GitHub Actions 传进来的参数，如果没有传，默认是 BTCUSDT 的 1小时(60)
+SYMBOL = os.getenv("TV_SYMBOL", "BINANCE:BTCUSDT")
+INTERVAL = os.getenv("TV_INTERVAL", "60")  
+
+# 给不同的周期起个中文名，用于飞书标题
+INTERVAL_MAP = {
+    "60": "1小时",
+    "240": "4小时",
+    "D": "日线",
+    "W": "周线"
+}
+# 获取当前周期的中文名
+TIME_TEXT = INTERVAL_MAP.get(INTERVAL, f"{INTERVAL}周期")
 
 def get_feishu_token():
     url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
@@ -17,7 +26,6 @@ def get_feishu_token():
     return res.get("tenant_access_token")
 
 def get_chart_image():
-    # 动态生成挂件 HTML
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -50,23 +58,13 @@ def get_chart_image():
     </html>
     """
 
-    print("启动隐形浏览器截图中...")
+    print(f"启动浏览器截取 {SYMBOL} {TIME_TEXT} 图表中...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
-        
-        # 绝招1：直接把网页内容塞进浏览器，避免本地文件权限问题
         page.set_content(html_content)
-        
-        # 绝招2：TradingView把图表藏在 iframe 里，所以我们等 iframe 加载出来！
-        print("等待图表框架加载...")
         page.wait_for_selector("iframe", timeout=20000)
-        
-        # 绝招3：框架出来后，它还要通过网络去拉取K线数据并渲染。我们强行给它 8 秒钟的耐心！
-        print("正在获取最新K线数据并渲染图表，请等待8秒...")
         page.wait_for_timeout(8000)
-        
-        # 咔嚓！截图！
         image_bytes = page.screenshot(type="png")
         browser.close()
         return image_bytes
@@ -82,7 +80,26 @@ def upload_image_to_feishu(image_bytes, token):
     return res.get("data", {}).get("image_key")
 
 def send_feishu_msg(image_key):
-    payload = {"msg_type": "image", "content": {"image_key": image_key}}
+    # 【升级点】使用飞书互动卡片，带蓝色大标题
+    payload = {
+        "msg_type": "interactive",
+        "card": {
+            "elements":[
+                {
+                    "tag": "img",
+                    "img_key": image_key,
+                    "alt": {"tag": "plain_text", "content": "图表"}
+                }
+            ],
+            "header": {
+                "title": {
+                    "content": f"📈 {SYMBOL} {TIME_TEXT} 收盘图表已生成",
+                    "tag": "plain_text"
+                },
+                "template": "blue"  # 标题栏颜色
+            }
+        }
+    }
     res = requests.post(FEISHU_WEBHOOK, json=payload)
     print("发送飞书结果:", res.text)
 
@@ -93,6 +110,4 @@ if __name__ == "__main__":
         image_key = upload_image_to_feishu(image_bytes, token)
         if image_key:
             send_feishu_msg(image_key)
-            print("✅ 高清无水印图表发送成功！")
-        else:
-            print("❌ 图片上传飞书失败")
+            print(f"✅ {TIME_TEXT} 图表发送成功！")
