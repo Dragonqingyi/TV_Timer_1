@@ -16,12 +16,7 @@ SYMBOLS =[s.strip() for s in TV_SYMBOLS_ENV.split(",")]
 
 INTERVAL = os.getenv("TV_INTERVAL", "60")
 
-INTERVAL_MAP = {
-    "60": "1小时",
-    "240": "4小时",
-    "D": "日线",
-    "W": "周线"
-}
+INTERVAL_MAP = {"60": "1小时", "120": "2小时", "240": "4小时", "D": "日线", "W": "周线"}
 TIME_TEXT = INTERVAL_MAP.get(INTERVAL, f"{INTERVAL}周期")
 
 MAX_RETRY = 3  # 保留 GPT 优秀的重试机制
