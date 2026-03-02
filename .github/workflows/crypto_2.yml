@@ -1,7 +1,8 @@
-name: Send CN Futures Chart (Dynamic)
+name: Send Crypto2 Chart (Dynamic)
 
 on:
   workflow_dispatch:
+    # 👇 接收外部传进来的周期参数
     inputs:
       interval:
         description: '请输入周期 (60=1h, 240=4h, D=日线)'
@@ -27,13 +28,13 @@ jobs:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           
-          # 👇 核心1：填入国内期货群的 Webhook (或者复用你之前的)
-          FEISHU_WEBHOOK: ${{ secrets.CN_FUTURES_WEBHOOK }} 
+          # 👇 核心1：这是发到你原来那个币圈群的 Webhook
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU2_WEBHOOK }} 
           
-          # 👇 核心2：填入你要看的国内期货代码（这里我帮你写了玻璃和纯碱的主力）
-          TV_SYMBOLS: 'ZCE:FG1!,ZCE:SA1!'
+          # 👇 核心2：数字货币热门
+          TV_SYMBOLS: 'BINANCE:ROBOUSDT.P,BINANCE:RIVERUSDT.P,BINANCE:BIANRENSHENGUSDT.P,BINANCE:UNIUSDT.P,BINANCE:ZECUSDT.P'
           
-          # 👇 核心3：自动提取外面传进来的参数
+          # 👇 核心3：提取外部参数喂给 Python
           TV_INTERVAL: ${{ github.event.inputs.interval }}
           
         run: python main.py
