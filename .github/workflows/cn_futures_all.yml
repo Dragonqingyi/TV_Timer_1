@@ -1,0 +1,39 @@
+name: Send CN Futures Chart (Dynamic)
+
+on:
+  workflow_dispatch:
+    inputs:
+      interval:
+        description: '请输入周期 (60=1h, 240=4h, D=日线)'
+        required: true
+        default: '60'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Chinese Fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-wqy-zenhei
+
+      - run: pip install requests playwright && playwright install chromium
+      
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          
+          # 👇 核心1：填入国内期货群的 Webhook (或者复用你之前的)
+          FEISHU_WEBHOOK: ${{ secrets.CN_FUTURES_WEBHOOK }} 
+          
+          # 👇 核心2：填入你要看的国内期货代码（这里我帮你写了玻璃和纯碱的主力）
+          TV_SYMBOLS: 'ZCE:FG1!,ZCE:SA1!'
+          
+          # 👇 核心3：自动提取外面传进来的参数
+          TV_INTERVAL: ${{ github.event.inputs.interval }}
+          
+        run: python main.py
