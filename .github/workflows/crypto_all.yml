@@ -1,0 +1,40 @@
+name: Send Crypto Chart (Dynamic)
+
+on:
+  workflow_dispatch:
+    # 👇 接收外部传进来的周期参数
+    inputs:
+      interval:
+        description: '请输入周期 (60=1h, 240=4h, D=日线)'
+        required: true
+        default: '60'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Chinese Fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-wqy-zenhei
+
+      - run: pip install requests playwright && playwright install chromium
+      
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          
+          # 👇 核心1：这是发到你原来那个币圈群的 Webhook
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }} 
+          
+          # 👇 核心2：数字货币三大金刚
+          TV_SYMBOLS: 'BINANCE:BTCUSDT.P,BINANCE:ETHUSDT.P,BINANCE:SOLUSDT.P'
+          
+          # 👇 核心3：提取外部参数喂给 Python
+          TV_INTERVAL: ${{ github.event.inputs.interval }}
+          
+        run: python main.py
