@@ -1,0 +1,36 @@
+name: Send Metals Chart (Dynamic)
+
+on:
+  workflow_dispatch:
+    # 👇 核心魔法1：在这里定义一个接收外部参数的入口
+    inputs:
+      interval:
+        description: '请输入周期 (60=1h, 240=4h, D=日线)'
+        required: true
+        default: '60'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Chinese Fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-wqy-zenhei
+
+      - run: pip install requests playwright && playwright install chromium
+      
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_WEBHOOK: ${{ secrets.METALS_WEBHOOK }}
+          TV_SYMBOLS: 'BINANCE:XAUUSDT.P,BINANCE:XAGUSDT.P'
+          
+          # 👇 核心魔法2：自动提取外面传进来的参数，喂给 Python
+          TV_INTERVAL: ${{ github.event.inputs.interval }}
+          
+        run: python main.py
