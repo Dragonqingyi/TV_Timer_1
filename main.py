@@ -68,11 +68,20 @@ def send_feishu_msg(image_key, symbol):
 # 浏览器截图核心
 # =============================
 def get_chart_image(browser, symbol):
+    
+    # 🎯 核心改动：主图表设置 (消除水平和垂直网格线)
+    chart_overrides = {
+        "paneProperties.vertGridProperties.color": "rgba(0, 0, 0, 0)",  # 隐藏垂直网格线
+        "paneProperties.horzGridProperties.color": "rgba(0, 0, 0, 0)"   # 隐藏水平网格线
+    }
+    chart_overrides_json = json.dumps(chart_overrides)
+
     # 没有任何额外指标，最纯净的原生 K 线图
+    # 注意：把 body 的 background-color 改成了 #ffffff，与白底主题完全匹配
     html_content = f"""
     <!DOCTYPE html>
     <html>
-    <body style="margin:0; background-color:#131722;">
+    <body style="margin:0; background-color:#ffffff;">
     <div id="tv_chart"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
@@ -89,7 +98,8 @@ def get_chart_image(browser, symbol):
         "hide_top_toolbar": false,
         "hide_legend": false,
         "save_image": false,
-        "container_id": "tv_chart"
+        "container_id": "tv_chart",
+        "overrides": {chart_overrides_json}   // 👈 注入去网格线代码
     }});
     </script>
     </body>
