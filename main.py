@@ -69,15 +69,23 @@ def send_feishu_msg(image_key, symbol):
 # =============================
 def get_chart_image(browser, symbol):
     
-    # 🎯 核心改动：主图表设置 (消除水平和垂直网格线)
+    # 🎯 核心改动：主图表设置 (消除网格线 + 自定义 K 线配色)
     chart_overrides = {
-        "paneProperties.vertGridProperties.color": "rgba(0, 0, 0, 0)",  # 隐藏垂直网格线
-        "paneProperties.horzGridProperties.color": "rgba(0, 0, 0, 0)"   # 隐藏水平网格线
+        # 隐藏网格线
+        "paneProperties.vertGridProperties.color": "rgba(0, 0, 0, 0)",
+        "paneProperties.horzGridProperties.color": "rgba(0, 0, 0, 0)",
+        
+        # 👇 新增：将所有 K 线的边框（Border）改为纯黑色
+        "mainSeriesProperties.candleStyle.borderUpColor": "#000000",    # 阳线边框：黑
+        "mainSeriesProperties.candleStyle.borderDownColor": "#000000",  # 阴线边框：黑
+        
+        # 👇 新增：将所有 K 线的上下影线（Wick）改为纯黑色
+        "mainSeriesProperties.candleStyle.wickUpColor": "#000000",      # 阳线影线：黑
+        "mainSeriesProperties.candleStyle.wickDownColor": "#000000"     # 阴线影线：黑
     }
     chart_overrides_json = json.dumps(chart_overrides)
 
     # 没有任何额外指标，最纯净的原生 K 线图
-    # 注意：把 body 的 background-color 改成了 #ffffff，与白底主题完全匹配
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -99,7 +107,7 @@ def get_chart_image(browser, symbol):
         "hide_legend": false,
         "save_image": false,
         "container_id": "tv_chart",
-        "overrides": {chart_overrides_json}   // 👈 注入去网格线代码
+        "overrides": {chart_overrides_json}   // 👈 注入去网格和黑框代码
     }});
     </script>
     </body>
@@ -112,7 +120,7 @@ def get_chart_image(browser, symbol):
     
     # 等待框架加载
     page.wait_for_selector("iframe", timeout=20000)
-    # 等待8秒，确保 K 线和底部的成交量柱子完全渲染出来
+    # 等待8秒，确保 K 线渲染出来
     page.wait_for_timeout(8000) 
     
     # 截图并关闭标签页
