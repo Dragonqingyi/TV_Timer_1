@@ -1,0 +1,40 @@
+name: Send Leyla Chart (Dynamic)
+
+on:
+  workflow_dispatch:
+    inputs:
+      # 👇 新增：接收从 Cloudflare 传来的具体币种代码
+      symbol:
+        description: '请输入交易对 (如 BINANCE:BTCUSDT.P)'
+        required: true
+        default: 'BINANCE:BTCUSDT.P'
+      interval:
+        description: '请输入周期 (60, 240, D)'
+        required: true
+        default: '60'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Chinese Fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-wqy-zenhei
+
+      - run: pip install requests playwright && playwright install chromium
+      
+      - name: Run Script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU3_WEBHOOK }} 
+          
+          # 👇 核心改动：把以前写死的币种，改成外部传入的币种！
+          TV_SYMBOLS: ${{ github.event.inputs.symbol }}
+          TV_INTERVAL: ${{ github.event.inputs.interval }}
+          
+        run: python main.py
