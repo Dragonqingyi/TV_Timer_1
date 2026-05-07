@@ -32,7 +32,7 @@ jobs:
           FEISHU_WEBHOOK: ${{ secrets.FEISHU2_WEBHOOK }} 
           
           # 👇 核心2：数字货币热门
-          TV_SYMBOLS: 'BINANCE:ROBOUSDT.P,BINANCE:RIVERUSDT.P,BINANCE:BIANRENSHENGUSDT.P,BINANCE:UNIUSDT.P,BINANCE:ZECUSDT.P'
+          TV_SYMBOLS: 'BINANCE:RIVERUSDT.P,BINANCE:BIANRENSHENGUSDT.P,BINANCE:ZECUSDT.P'
           
           # 👇 核心3：提取外部参数喂给 Python
           TV_INTERVAL: ${{ github.event.inputs.interval }}
