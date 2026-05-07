@@ -28,7 +28,7 @@ jobs:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_WEBHOOK: ${{ secrets.METALS_WEBHOOK }}
-          TV_SYMBOLS: 'BINANCE:XAUUSDT.P,BINANCE:XAGUSDT.P,TVC:USOIL'
+          TV_SYMBOLS: 'BINANCE:XAUUSDT.P,BINANCE:CLUSDT.P'
           
           # 👇 核心魔法2：自动提取外面传进来的参数，喂给 Python
           TV_INTERVAL: ${{ github.event.inputs.interval }}
